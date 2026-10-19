@@ -20,3 +20,5 @@ OpenBW UI stubs originated in the maintainer's scbwfactory project; confirm thei
 licensing provenance in the final release review. See THIRD_PARTY_NOTICES.md for licensing status.
 
 Credits acknowledge contributions; they do not imply endorsement or grant rights to third-party work.
+
+Documentation screenshots in `docs/media/` show the editor using locally installed game artwork. That artwork remains owned by its respective rights holders.

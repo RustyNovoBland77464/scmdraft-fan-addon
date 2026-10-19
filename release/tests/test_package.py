@@ -17,6 +17,7 @@ class PackageChecks(unittest.TestCase):
             self.assertIn("hd/src/live.cpp", names)
             self.assertIn("release/CMakeLists.txt", names)
             self.assertIn(".github/workflows/build.yml", names)
+            self.assertTrue(prepare.DOCUMENTATION_MEDIA.issubset(names))
             self.assertFalse(any(n.startswith(("re/", "tools/", "experiments/", "minesim/studies/")) for n in names))
             self.assertFalse((source / ".git").exists())
             self.assertFalse((source / "third_party/openbw").exists())
@@ -34,7 +35,7 @@ class PackageChecks(unittest.TestCase):
                 self.assertEqual(hashlib.sha256((source / name).read_bytes()).hexdigest(), digest)
 
     def test_audit_rejects_game_files_private_paths_and_credentials(self):
-        for name, data in (("map.scx", b"map"), ("decomp.c", b"// " + b"/" + b"Users/private/project"),
+        for name, data in (("map.scx", b"map"), ("art.png", b"image"), ("decomp.c", b"// " + b"/" + b"Users/private/project"),
                            ("token.txt", b"ghp_" + b"x" * 36)):
             with self.subTest(name=name), tempfile.TemporaryDirectory() as tmp:
                 root = Path(tmp)
@@ -47,6 +48,15 @@ class PackageChecks(unittest.TestCase):
             root = Path(tmp)
             (root / "re/out").mkdir(parents=True)
             (root / "re/out/export.c").write_text("example")
+            with self.assertRaises(ValueError):
+                prepare.audit_source(root)
+
+    def test_documentation_media_requires_png(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            p = root / "docs/media/hd-graphics.png"
+            p.parent.mkdir(parents=True)
+            p.write_bytes(b"not a PNG")
             with self.assertRaises(ValueError):
                 prepare.audit_source(root)
 

@@ -11,6 +11,10 @@ import subprocess
 import zipfile
 
 ROOT = Path(__file__).resolve().parent.parent
+DOCUMENTATION_MEDIA = {
+    "docs/media/hd-graphics.png", "docs/media/terrain-mirroring.png",
+    "docs/media/hitboxes.png", "docs/media/mining-boosts.png",
+}
 DOCS = {"README.md": "README.md", "INSTALL.md": "INSTALL.md", "BUILDING.md": "BUILDING.md",
         "CREDITS.md": "CREDITS.md", "LICENSE": "LICENSE", "THIRD_PARTY_NOTICES.md": "THIRD_PARTY_NOTICES.md",
         "RELEASE_READINESS.md": "RELEASE_READINESS.md", "CHANGELOG.md": "CHANGELOG.md",
@@ -28,7 +32,10 @@ def audit_source(tree):
         rel = path.relative_to(tree)
         if path.is_symlink() or any(part in {".git", "re", "sample", "shots", "studies", "__pycache__"} for part in rel.parts):
             raise ValueError(f"Forbidden source path: {rel}")
-        if path.suffix.lower() in {".exe", ".dll", ".sdp", ".mpq", ".scx", ".scm", ".chk", ".png", ".dds", ".anim", ".dmp"}:
+        documentation_image = rel.as_posix() in DOCUMENTATION_MEDIA
+        if documentation_image and not path.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
+            raise ValueError(f"Invalid documentation PNG: {rel}")
+        if not documentation_image and path.suffix.lower() in {".exe", ".dll", ".sdp", ".mpq", ".scx", ".scm", ".chk", ".png", ".dds", ".anim", ".dmp"}:
             raise ValueError(f"Binary/game file in source export: {rel}")
         if BAD_TEXT.search(path.read_bytes()):
             raise ValueError(f"Private path or credential-like text: {rel}")
@@ -66,6 +73,8 @@ def documents(tree):
     for src, dest in DOCS.items():
         copy(ROOT / "release/docs" / src, tree / dest)
     copy(ROOT / "release/dependencies.json", tree / "DEPENDENCIES.json")
+    for rel in sorted(DOCUMENTATION_MEDIA):
+        copy(ROOT / rel, tree / rel)
 
 def prepare(out, build=None):
     if build:

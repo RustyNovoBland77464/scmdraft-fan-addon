@@ -25,19 +25,30 @@ release contains our extension, not the original ScmDraft source code.
 
 ## Features
 
-- Remastered and Carbot terrain, units and sprites read from your own game installation.
-- Additional terrain symmetry controls, mirrored terrain copying and alternate terrain selection.
-- Building and unit collision-box overlays.
-- Animated mining tests for Terran, Protoss and Zerg, with per-patch cycle times and income statistics.
-- Timed, resumable searches for position, Return Cargo and cycle boosts.
-- Command guides and translucent worker markers, with separate visibility controls.
-- 1x, 2x and 4x mining playback, plus independent testing at multiple bases.
+- **HD graphics:** Remastered and Carbot terrain, units and sprites read from your own game installation.
+
+  ![Remastered terrain, units and sprites in ScmDraft](docs/media/hd-graphics.png)
+
+- **Terrain symmetry:** additional symmetry controls, mirrored terrain copying and alternate terrain selection.
+
+  ![Source terrain, a pixel flip, and the terrain-aware Copy Mirrored result](docs/media/terrain-mirroring.png)
+
+- **Hitboxes:** separate overlays for actual building and unit collision boxes.
+
+  ![Building and unit collision boxes overlaid in the editor](docs/media/hitboxes.png)
+
+- **Mining tests:** animated Terran, Protoss and Zerg workers, with per-patch cycle times and income statistics.
+- **Boost searches:** timed, resumable searches for position, Return Cargo and cycle boosts.
+- **Command guides:** translucent worker markers and arrows, with separate visibility controls.
+- **Playback:** 1x, 2x and 4x speed, plus independent testing at multiple bases.
+
+  ![Mining panel with search budgets, cycle times, boost guides and playback controls](docs/media/mining-boosts.png)
 
 ## Requirements and downloads
 
 You supply ScmDraft 2 and a local StarCraft installation with the required game data.
 HD/Carbot modes require the corresponding available assets and rights to use them.
-No Blizzard graphics or original ScmDraft executable are included.
+No game-data archives or original ScmDraft executable are included. Documentation screenshots show locally installed game artwork.
 
 The Windows build targets Windows 10/11 (32-bit plugin, also usable on 64-bit Windows).
 Only one exact **32-bit ScmDraft 0.9.10** executable is supported; see [INSTALL.md](INSTALL.md).

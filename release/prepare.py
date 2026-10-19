@@ -119,10 +119,11 @@ def prepare(out, build=None):
         copy(source / "SOURCE_MANIFEST.json", binary / "SOURCE_MANIFEST.json")
         for name in ("scmhd.sdp", "minesim.exe"):
             copy(build / name, binary / "plugins" / name)
+        copy(build / "ScmDraft-Fan-Edit-NOTICES.txt", binary / "plugins/ScmDraft-Fan-Edit-NOTICES.txt")
         copy(build / "fan-edit-setup.exe", binary / "fan-edit-setup.exe")
-        (binary / "DRAFT-NOT-FOR-DISTRIBUTION.txt").write_text(
-            "Local release candidate. Resolve RELEASE_READINESS.md before publishing.\n"
-            "No original ScmDraft executable or Blizzard assets are included.\n")
+        (binary / "PRIVATE-PREVIEW.txt").write_text(
+            "Private testing build. Public distribution is pending RELEASE_READINESS.md.\n"
+            "No original ScmDraft executable or game-data archives are included.\n")
         archives.append(seal(binary))
     (out / "SHA256SUMS.txt").write_text("".join(f"{hashlib.sha256(a.read_bytes()).hexdigest()}  {a.name}\n" for a in archives))
     return source

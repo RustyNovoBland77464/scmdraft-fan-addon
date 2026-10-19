@@ -1,0 +1,4 @@
+#include <windows.h>
+201 RCDATA "@PAYLOAD_DIRECTORY@/scmhd.sdp"
+202 RCDATA "@PAYLOAD_DIRECTORY@/minesim.exe"
+203 RCDATA "@NOTICES@"

@@ -17,23 +17,30 @@ Obtain the editor from its author: https://www.stormcoast-fortress.net/cntt/soft
 That page is a reference; we have not confirmed that every linked download is the supported build.
 Keep your original download and any editor/runtime installation instructions.
 
-## Windows package
+## Windows installer
 
-1. Extract the **entire ZIP** into a temporary folder.
-2. Run `fan-edit-setup.exe` and select the executable in your existing ScmDraft installation.
-3. Confirm the displayed destination. Use a writable editor folder, outside Program Files if necessary.
-4. Optionally choose your local StarCraft game folder when prompted.
-5. Start ScmDraft normally. Fan Edit loads as `plugins/scmhd.sdp`.
+[Download the standalone installer](https://github.com/RustyNovoBland77464/scmdraft-fan-edit/releases/download/v0.1.0-preview.1/scmdraft-fan-edit-0.1.0-setup.exe). GitHub sign-in and repository access are required.
 
-Setup backs up existing `scmhd.sdp` and `minesim.exe` into a unique `plugins/sfe*.tmp` folder before
-replacement. It does not change the original editor executable, maps or game files.
+1. Run the downloaded `.exe` and select the executable in your existing ScmDraft installation.
+2. Confirm the displayed destination. Use a writable editor folder, outside Program Files if necessary.
+3. Optionally choose your local StarCraft game folder when prompted.
+4. Start ScmDraft normally. Fan Edit loads as `plugins/scmhd.sdp`.
+
+The installer contains the plugin, mining tool and notices. It unpacks them to a temporary folder,
+installs them, then removes the temporary copy. No companion ZIP or internet connection is needed after download.
+
+Setup backs up existing Fan Edit files into a unique `plugins/sfe*.tmp` folder before replacement.
+It does not change the original editor executable, maps or game files. Dependency/license notices
+are installed as `plugins/ScmDraft-Fan-Edit-NOTICES.txt`.
 Choosing a game folder saves only Fan Edit's per-user `StarcraftPath` setting in
 `HKEY_CURRENT_USER\Software\ScmDraft HD`. Skipping the chooser keeps the existing setting/detection.
-If a copy fails, it attempts to restore any files it replaced and reports the backup location.
-Keep the ZIP's documentation and license notices with your installation.
+If a copy fails, Setup attempts to restore any files it replaced and reports the backup location.
 
-Manual installation: copy `plugins/scmhd.sdp` and `plugins/minesim.exe` into the existing editor's
-`plugins` folder, backing up older copies first. Retain the package's notices and license files.
+## Portable ZIP
+
+[Download the portable package](https://github.com/RustyNovoBland77464/scmdraft-fan-edit/releases/download/v0.1.0-preview.1/scmdraft-fan-edit-0.1.0-windows-x86.zip) and extract the whole ZIP.
+Run `fan-edit-setup.exe` from it, or manually copy the three files in `plugins/` into your editor's
+`plugins` folder, backing up older copies first. Keep the package's documentation and license files.
 
 ## Your StarCraft installation
 
@@ -70,7 +77,7 @@ through Wine's paths and registry. This package does not install, duplicate or r
 - Missing menus: check plugin location, supported executable and the `plugins/scmhd.log` diagnostic log.
 - Missing HD art: rerun Setup to choose the correct local game folder, then restart ScmDraft.
 - Read errors: verify game files through the official game launcher, then restart the editor.
-- Uninstall: close the editor and remove the two installed Fan Edit files. If you had older versions,
+- Uninstall: close the editor and remove `scmhd.sdp`, `minesim.exe` and `ScmDraft-Fan-Edit-NOTICES.txt`. If you had older versions,
   restore the copies in Setup's backup folder. Keep other plugins such as TrigEdit.
   Optional cleanup: remove `StarcraftPath` from `HKEY_CURRENT_USER\Software\ScmDraft HD`.
 

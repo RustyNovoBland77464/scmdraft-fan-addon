@@ -1,7 +1,7 @@
 # Release readiness — local draft 0.1.0
 
-Prepared locally; no public repository, upload, release announcement or author outreach is performed
-by these tools. The maintainer is contacting the original creator separately.
+A private preview installer is available to repository collaborators. Public distribution is still pending
+the checks below. The maintainer is contacting the original creator separately.
 
 ## Before publishing source
 
@@ -37,7 +37,7 @@ A macOS app wrapper is a separate packaging task with its own runtime audit and 
 - [x] Source export from explicit paths, with private history/decompiler/game-data exclusions.
 - [x] Pinned dependency bootstrap and CI build definition without automatic uploads.
 - [x] Windows setup executable with exact host hash verification, staging, backups and copy-failure rollback.
-- [x] Portable two-file runtime layout; no original editor or game assets bundled.
+- [x] Portable runtime layout with dependency notices; no original editor or game assets bundled.
 - [x] Installation/removal, build, credits, license scope and contributor documentation.
 - [x] Draft package and ZIP SHA-256 manifests.
 

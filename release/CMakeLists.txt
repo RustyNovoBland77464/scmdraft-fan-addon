@@ -34,7 +34,22 @@ add_executable(minesim "${ROOT}/minesim/minesim.cpp")
 target_include_directories(minesim PRIVATE "${BW}" "${BW}/deps" "${ROOT}/third_party/CascLib/src")
 target_compile_options(minesim PRIVATE -w)
 target_link_libraries(minesim PRIVATE casc_static ws2_32 wininet)
-add_executable(fan-edit-setup WIN32 installer/setup.cpp installer/setup.rc)
+set(PAYLOAD_DIRECTORY "${CMAKE_BINARY_DIR}")
+set(NOTICES "${CMAKE_BINARY_DIR}/ScmDraft-Fan-Edit-NOTICES.txt")
+file(WRITE "${NOTICES}" "ScmDraft Fan Edit - third-party notices\n\n")
+foreach(NOTICE IN ITEMS release/docs/LICENSE release/docs/THIRD_PARTY_NOTICES.md
+    third_party/CascLib/LICENSE third_party/minhook/LICENSE.txt
+    third_party/openbw/deps/asio/LICENSE_1_0.txt third_party/CascLib/src/zlib/zlib.h
+    third_party/CascLib/src/hashes/sha1.h third_party/CascLib/src/hashes/md5.h
+    third_party/CascLib/src/overwatch/aes.h third_party/CascLib/src/jenkins/lookup.h)
+  file(READ "${ROOT}/${NOTICE}" CONTENT)
+  set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${ROOT}/${NOTICE}")
+  file(APPEND "${NOTICES}" "\n--- ${NOTICE} ---\n${CONTENT}\n")
+endforeach()
+configure_file(installer/payload.rc.in "${CMAKE_BINARY_DIR}/payload.rc" @ONLY)
+set_source_files_properties("${CMAKE_BINARY_DIR}/payload.rc" PROPERTIES OBJECT_DEPENDS "${CMAKE_BINARY_DIR}/scmhd.sdp;${CMAKE_BINARY_DIR}/minesim.exe;${NOTICES}")
+add_executable(fan-edit-setup WIN32 installer/setup.cpp installer/setup.rc "${CMAKE_BINARY_DIR}/payload.rc")
+add_dependencies(fan-edit-setup scmhd minesim)
 target_include_directories(fan-edit-setup PRIVATE installer)
 target_compile_definitions(fan-edit-setup PRIVATE UNICODE _UNICODE)
 target_link_options(fan-edit-setup PRIVATE -municode)

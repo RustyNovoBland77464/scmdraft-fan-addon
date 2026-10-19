@@ -17,4 +17,6 @@ jobs:
         run: cmake --build build/release --parallel 2
       - name: Portable regression checks
         run: python3 release/check.py
+      - name: Verify self-contained installer
+        run: python3 release/verify_installer.py build/release
       # No upload or publication: enabling public binary artifacts waits for the readiness review.

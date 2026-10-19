@@ -50,6 +50,39 @@ static void configureGameFolder() {
     }
     if (SUCCEEDED(initialized)) CoUninitialize();
 }
+static const std::vector<std::wstring> payloadNames{
+    L"scmhd.sdp", L"minesim.exe", L"ScmDraft-Fan-Edit-NOTICES.txt"};
+struct Payload {
+    std::wstring directory;
+    ~Payload() {
+        if (directory.empty()) return;
+        for (const auto &name : payloadNames) DeleteFileW((directory + L"\\" + name).c_str());
+        RemoveDirectoryW(directory.c_str());
+    }
+    bool extract() {
+        wchar_t temp[MAX_PATH]{}, folder[MAX_PATH]{};
+        DWORD length = GetTempPathW(MAX_PATH, temp);
+        if (!length || length >= MAX_PATH || !GetTempFileNameW(temp, L"sfe", 0, folder)) return false;
+        DeleteFileW(folder);
+        if (!CreateDirectoryW(folder, nullptr)) return false;
+        directory = folder;
+        for (size_t i = 0; i < payloadNames.size(); ++i) {
+            HRSRC resource = FindResourceW(nullptr, MAKEINTRESOURCEW(201 + i), RT_RCDATA);
+            if (!resource) return false;
+            DWORD size = SizeofResource(nullptr, resource);
+            const void *bytes = LockResource(LoadResource(nullptr, resource));
+            if (!size || !bytes) return false;
+            HANDLE file = CreateFileW((directory + L"\\" + payloadNames[i]).c_str(), GENERIC_WRITE,
+                0, nullptr, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (file == INVALID_HANDLE_VALUE) return false;
+            DWORD written = 0;
+            bool ok = WriteFile(file, bytes, size, &written, nullptr) && written == size;
+            CloseHandle(file);
+            if (!ok) return false;
+        }
+        return true;
+    }
+};
 int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     wchar_t exe[32768]{};
     OPENFILENAMEW dialog{}; dialog.lStructSize = sizeof dialog;
@@ -66,14 +99,13 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     if (running(exe)) {
         message(L"Close this ScmDraft instance before installing, then run Setup again."); return 1;
     }
-    wchar_t self[32768]; DWORD len = GetModuleFileNameW(nullptr, self, 32768);
-    if (!len || len >= 32768) return 1;
-    std::wstring source = fan_edit::parent(self) + L"\\plugins";
-    std::wstring target = fan_edit::parent(exe) + L"\\plugins";
-    const std::vector<std::wstring> names{L"scmhd.sdp", L"minesim.exe"};
-    for (const auto &name : names) if (!fan_edit::fileExists(source + L"\\" + name)) {
-        message(L"The package is incomplete. Extract the entire ZIP before running Setup."); return 1;
+    Payload payload;
+    if (!payload.extract()) {
+        message(L"Could not unpack the installer. Check free disk space and download Setup again."); return 1;
     }
+    std::wstring source = payload.directory;
+    std::wstring target = fan_edit::parent(exe) + L"\\plugins";
+    const auto &names = payloadNames;
     if (MessageBoxW(nullptr, (L"Install Fan Edit into:\n" + target +
         L"\n\nExisting Fan Edit files will be backed up. The original editor and maps are not changed.").c_str(),
         L"ScmDraft Fan Edit — Setup", MB_OKCANCEL | MB_ICONINFORMATION) != IDOK) return 0;

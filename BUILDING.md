@@ -22,7 +22,7 @@ it refuses to replace an existing dependency at another revision. Upstream code 
 its owners, not bundled into this source ZIP. No game files are required to compile.
 
 Outputs: `scmhd.sdp`, `minesim.exe`, `fan-edit-setup.exe`, and the developer-only `installer-check.exe`.
-The plugin embeds the live simulator. The separate minesim executable supports offline CLI analysis.
+Setup embeds the two runtime files and dependency notices as Windows resources. The plugin embeds the live simulator. The separate minesim executable supports offline CLI analysis.
 Its CLI help is printed by running it without arguments; game-data/map inputs are supplied locally.
 
 Run the asset-free native regression checks with a host C++ compiler:
@@ -41,7 +41,7 @@ python3 release/prepare.py --out dist/local-draft --build build/release
 ```
 
 This exports an allowlisted source tree with no private Git history, upstream decompilations or game assets,
-and a Windows ZIP containing Setup plus the two runtime files. SHA-256 manifests accompany the files
+and a Windows ZIP containing the standalone Setup executable, runtime files and notices. SHA-256 manifests accompany the files
 and ZIPs. Existing packages are never overwritten. This command does not publish, sign or upload anything.
 Review `RELEASE_READINESS.md` before distributing the output. The source audit is a useful guard,
 not a substitute for reviewing code provenance, secrets and release contents.

@@ -1,16 +1,7 @@
 # Contributing
 
-See BUILDING.md. Use C++17 and the supported 32-bit toolchain. Keep changes focused and describe
-the user-visible result and how it was checked. Original contributions use the project's MIT license;
-identify any imported code and preserve its actual license and attribution.
+Report bugs in [Issues](https://github.com/RustyNovoBland77464/scmdraft-fan-edit/issues) with steps to reproduce, a screenshot and your OS/Wine version. For mining issues, include the map, race and boost settings.
 
-Do not submit the original editor, decompiler dumps, Blizzard/Carbot assets, private maps or credentials.
-Use synthetic fixtures for portable tests. Review logs for personal paths before sharing them.
+For code changes, follow [BUILDING.md](BUILDING.md) and open a pull request explaining what changed and how you tested it.
 
-The editor renders on a worker thread. Shared plugin state uses the drawing lock; never hold that
-lock while calling back into ScmDraft. Editor calls belong on the UI thread. Hook addresses are
-specific to the supported executable; do not bypass compatibility checks for an unverified build.
-
-For bug reports include the extension version, host executable hash, OS/Wine version, graphics mode,
-steps to reproduce and expected behavior. Attach maps only when you have permission to share them.
-For mining results include race, base, worker counts, enabled boosts and search budgets.
+Please don't include StarCraft assets or the original ScmDraft executable.

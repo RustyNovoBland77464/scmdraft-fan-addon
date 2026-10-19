@@ -1,0 +1,5 @@
+{
+  "CascLib": {"url": "https://github.com/ladislav-zezula/CascLib.git", "commit": "38a34665624b8775bb875274b36191b21c38d97b", "license": "MIT; bundled components need separate notices"},
+  "minhook": {"url": "https://github.com/TsudaKageyu/minhook.git", "commit": "8af6b4acae5a9388fd742b56fa79ece89d96f823", "license": "BSD-2-Clause"},
+  "openbw": {"url": "https://github.com/OpenBW/openbw.git", "commit": "4b046d5f65302b10cb0a745f0fecd37ec85b20a8", "license": "UNRESOLVED: establish main-code redistribution terms"}
+}

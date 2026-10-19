@@ -1,0 +1,8 @@
+/build/
+/dist/
+/third_party/CascLib/
+/third_party/minhook/
+/third_party/openbw/
+__pycache__/
+*.log
+.DS_Store

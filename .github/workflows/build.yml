@@ -1,0 +1,20 @@
+name: Build Fan Edit
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows-x86:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install toolchain
+        run: sudo apt-get update && sudo apt-get install -y cmake g++-mingw-w64-i686-posix
+      - name: Fetch pinned dependencies
+        run: python3 release/bootstrap.py
+      - name: Configure
+        run: cmake -S release -B build/release -DCMAKE_TOOLCHAIN_FILE="$PWD/third_party/mingw32.cmake" -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build/release --parallel 2
+      - name: Portable regression checks
+        run: python3 release/check.py
+      # No upload or publication: enabling public binary artifacts waits for the readiness review.

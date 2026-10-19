@@ -1,0 +1,6 @@
+LIBRARY scmhd.sdp
+EXPORTS
+    GetPluginVersion
+    InitPlugin
+    PluginGetMenuString
+    RunPlugin

@@ -943,10 +943,19 @@ BOOL WINAPI DllMain(HINSTANCE h, DWORD why, LPVOID) {
         InitializeCriticalSection(&g_drawLock);
         g_self = h;
         DisableThreadLibraryCalls(h);
-        char path[MAX_PATH];
-        GetModuleFileNameA(h, path, MAX_PATH);
-        strcpy(strrchr(path, '.'), ".log");
-        g_log = fopen(path, "w");
+        char path[MAX_PATH]{};
+        DWORD length = GetModuleFileNameA(h, path, MAX_PATH);
+        // Some MinGW headers prohibit strcpy. Also skip logging if the module path is truncated
+        // or has no room for the replacement suffix; hooks do not depend on the log being open.
+        if (length && length < MAX_PATH) {
+            char *extension = strrchr(path, '.');
+            char *separator = strrchr(path, '\\');
+            if (!extension || (separator && extension < separator)) extension = path + length;
+            if (static_cast<size_t>(extension - path) + sizeof(".log") <= sizeof path) {
+                memcpy(extension, ".log", sizeof(".log"));
+                g_log = fopen(path, "w");
+            }
+        }
         loadMode();
         logf("scmhd loaded, mode %d", g_mode);
         installHooks();

@@ -1,5 +1,18 @@
 # ScmDraft Fan Edit
 
+## Installation
+
+1. Get the **Windows package ZIP** from the maintainer and extract the entire ZIP into a temporary folder. Prebuilt downloads are not yet attached to this repository.
+2. Install **ScmDraft 2 0.9.10** and confirm it launches. Fan Edit requires a specific build; Setup checks compatibility.
+3. Install **StarCraft: Remastered** locally, including its game data.
+4. Close ScmDraft, run **`fan-edit-setup.exe`**, and select your existing ScmDraft executable.
+5. Confirm installation and choose the StarCraft game folder containing **`Data`** when prompted.
+6. Launch ScmDraft normally. In its own profile settings, also select the StarCraft game-data folder.
+7. Select **Triggers → HD Graphics → Remastered**. To try mining, select **Triggers → Test Mining**, start a base, enable a boost technique, and press **Search**.
+
+See [INSTALL.md](INSTALL.md) for the supported editor hash, manual installation, macOS/Wine setup, troubleshooting and removal.
+Building from source instead? Follow [BUILDING.md](BUILDING.md).
+
 An unofficial community extension for ScmDraft 2: HD graphics, additional terrain symmetry tools,
 and animated mining analysis with searches for position, Return Cargo and cycle boosts.
 

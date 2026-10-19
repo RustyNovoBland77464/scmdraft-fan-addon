@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1 — private preview
+
+Renamed to ScmDraft Fan Add-on. All add-on commands now live in the New menu, with shortcuts for mining, mirrored copy, unit-sprite replacement and hitboxes. Building and unit hitboxes start off on every launch.
+
 ## 0.1.0 — private preview
 
 Initial community extension package: HD terrain/units/sprites, additional terrain symmetry and

@@ -2,7 +2,7 @@
 
 - **Suicidal Insanity / Stormcoast Fortress** — creator of ScmDraft 2, the editor this extension builds on.
   Original project: https://www.stormcoast-fortress.net/
-- **ScmDraft Fan Edit contributors** — HD rendering integration, terrain tools, mining search and visualization,
+- **ScmDraft Fan Add-on contributors** — HD rendering integration, terrain tools, mining search and visualization,
   packaging, testing and documentation. Maintained by the owner of this project.
 - **OpenBW contributors** — the Brood War engine implementation used by the mining simulation.
   https://github.com/OpenBW/openbw

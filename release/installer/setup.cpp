@@ -6,7 +6,7 @@
 #include <vector>
 
 static void message(const std::wstring &s, UINT style = MB_ICONERROR) {
-    MessageBoxW(nullptr, s.c_str(), L"ScmDraft Fan Edit — Setup", MB_OK | style);
+    MessageBoxW(nullptr, s.c_str(), L"ScmDraft Fan Add-on — Setup", MB_OK | style);
 }
 static bool running(const std::wstring &exe) {
     HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
@@ -26,7 +26,7 @@ static bool running(const std::wstring &exe) {
 static void configureGameFolder() {
     if (MessageBoxW(nullptr, L"Choose your local StarCraft installation for HD graphics and mining?\n\n"
         L"Choose the game folder containing Data. You can skip this to use automatic detection.",
-        L"ScmDraft Fan Edit — Game Data", MB_YESNO | MB_ICONQUESTION) != IDYES) return;
+        L"ScmDraft Fan Add-on — Game Data", MB_YESNO | MB_ICONQUESTION) != IDYES) return;
     HRESULT initialized = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
     for (;;) {
         BROWSEINFOW browse{};
@@ -51,7 +51,7 @@ static void configureGameFolder() {
     if (SUCCEEDED(initialized)) CoUninitialize();
 }
 static const std::vector<std::wstring> payloadNames{
-    L"scmhd.sdp", L"minesim.exe", L"ScmDraft-Fan-Edit-NOTICES.txt"};
+    L"scmhd.sdp", L"minesim.exe", L"ScmDraft-Fan-Addon-NOTICES.txt"};
 struct Payload {
     std::wstring directory;
     ~Payload() {
@@ -93,7 +93,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     if (!GetOpenFileNameW(&dialog)) return 0;
     if (!fan_edit::supported(exe)) {
         message(L"This editor build is not supported. Nothing was installed.\n\n"
-                L"Fan Edit requires the exact ScmDraft 0.9.10 build documented in INSTALL.md.");
+                L"Fan Add-on requires the exact ScmDraft 0.9.10 build documented in INSTALL.md.");
         return 1;
     }
     if (running(exe)) {
@@ -106,9 +106,9 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
     std::wstring source = payload.directory;
     std::wstring target = fan_edit::parent(exe) + L"\\plugins";
     const auto &names = payloadNames;
-    if (MessageBoxW(nullptr, (L"Install Fan Edit into:\n" + target +
-        L"\n\nExisting Fan Edit files will be backed up. The original editor and maps are not changed.").c_str(),
-        L"ScmDraft Fan Edit — Setup", MB_OKCANCEL | MB_ICONINFORMATION) != IDOK) return 0;
+    if (MessageBoxW(nullptr, (L"Install Fan Add-on into:\n" + target +
+        L"\n\nExisting Fan Add-on files will be backed up. The original editor and maps are not changed.").c_str(),
+        L"ScmDraft Fan Add-on — Setup", MB_OKCANCEL | MB_ICONINFORMATION) != IDOK) return 0;
     if (!CreateDirectoryW(target.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS) {
         message(L"Cannot create the plugins folder. Use a writable ScmDraft installation folder."); return 1;
     }
@@ -144,7 +144,7 @@ int WINAPI wWinMain(HINSTANCE, HINSTANCE, PWSTR, int) {
         return 1;
     }
     configureGameFolder();
-    message(L"Fan Edit installed. Start ScmDraft normally.\n\n"
+    message(L"Fan Add-on installed. Start ScmDraft normally.\n\n"
             L"See INSTALL.md for selecting your StarCraft data and enabling HD graphics.\n\n"
             L"Backup folder (if previous files existed):\n" + backup, MB_ICONINFORMATION);
     return 0;

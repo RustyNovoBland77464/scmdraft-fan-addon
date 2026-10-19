@@ -29,6 +29,7 @@
 #include "MinHook.h"
 #include "hd_sprites.h"
 #include "map_sampling.h"
+#include "addon_commands.h"
 
 FILE *g_log;
 
@@ -109,11 +110,13 @@ template <class T> T &at(void *p, int off) { return *reinterpret_cast<T *>(stati
 
 // ---- menu ids (FourCC) --------------------------------------------------------------------------
 constexpr DWORD kMenuOff = 'HDOF', kMenuHD = 'HDHD', kMenuCarbot = 'HDCB', kMenuLive = 'LIVE', kMenuMirror = 'MIRR', kMenuUnitSprite = 'USPR', kMenuBuildingBoxes = 'BBOX', kMenuUnitBoxes = 'UBOX';
-const char *kMirrorMenuText = "Copy Mirrored (Left-Right)\tCtrl+Shift+C";
-const char *kUnitSpriteMenuText = "Replace by Unit Sprite";
-const char *kLiveMenuText = "Test Mining";
-const char *kBuildingBoxesText = "Show Building Hitboxes";
-const char *kUnitBoxesText = "Show Unit Hitboxes";
+const char *kMirrorMenuText = addon_commands::entries[4].label;
+const char *kUnitSpriteMenuText = addon_commands::entries[5].label;
+const char *kLiveMenuText = addon_commands::entries[3].label;
+const char *kBuildingBoxesText = addon_commands::entries[6].label;
+const char *kUnitBoxesText = addon_commands::entries[7].label;
+constexpr UINT_PTR kMenuSetupTimer = 0x46414e4d;
+void runAddonCommand(HWND mainWnd, int index);
 enum Mode { MODE_OFF = 0, MODE_HD = 1, MODE_CARBOT = 2 };
 
 HMODULE g_self;
@@ -706,25 +709,23 @@ BOOL WINAPI BitBltHook(HDC hdcDst, int xd, int yd, int w, int h, HDC hdcSrc, int
     return r;
 }
 
-bool mirroredCopyKey(UINT msg, WPARAM key) {
-    return msg == WM_KEYDOWN && key == 'C' && (GetKeyState(VK_CONTROL) & 0x8000) &&
-           (GetKeyState(VK_SHIFT) & 0x8000) && !(GetKeyState(VK_MENU) & 0x8000);
+int addonShortcut(UINT msg, WPARAM key) {
+    if (msg != WM_KEYDOWN) return -1;
+    return addon_commands::shortcut(static_cast<unsigned>(key), GetKeyState(VK_CONTROL) & 0x8000,
+        GetKeyState(VK_SHIFT) & 0x8000, GetKeyState(VK_MENU) & 0x8000);
 }
 
-// CMainGUI::PreTranslateMessage (0x50f7d0) translates accelerators before dispatching to
-// MapWndProc. Catch our chord here so ScmDraft cannot turn it into an ordinary Copy first.
+// CMainGUI translates accelerators before map messages. Intercept only map-focused chords,
+// so text fields/dialogs retain native editing shortcuts. Repeats are consumed without toggling.
 using TranslateAcceleratorFn = int (WINAPI *)(HWND, HACCEL, LPMSG);
 TranslateAcceleratorFn g_origTranslateAccelerator;
 int WINAPI TranslateAcceleratorHook(HWND mainWnd, HACCEL accel, LPMSG msg) {
-    if (msg && mirroredCopyKey(msg->message, msg->wParam) && GetAncestor(msg->hwnd, GA_ROOT) == mainWnd) {
+    int command = msg ? addonShortcut(msg->message, msg->wParam) : -1;
+    if (command >= 0 && GetAncestor(msg->hwnd, GA_ROOT) == mainWnd) {
         wchar_t cls[64] = L"";
         GetClassNameW(msg->hwnd, cls, 64);
         if (!lstrcmpiW(cls, L"ScmDraft Map Window")) {
-            // Consume repeats too, but only copy once per press.
-            if (!(msg->lParam & (1L << 30))) {
-                logf("mirror: Ctrl+Shift+C accelerator");
-                sym::requestMirroredCopy(mainWnd, scmhdActiveMap());
-            }
+            if (!(msg->lParam & (1L << 30))) runAddonCommand(mainWnd, command);
             return 1;
         }
     }
@@ -737,8 +738,9 @@ LRESULT CALLBACK MapWndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     int x = (short)LOWORD(lp), y = (short)HIWORD(lp);
     if ((msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK) && live::onClick(h, x, y)) { swallowUp = true; redrawLast(); return 0; }
     if (msg == WM_LBUTTONUP && swallowUp) { swallowUp = false; return 0; }
-    if (mirroredCopyKey(msg, wp)) {
-        if (!(lp & (1L << 30))) sym::requestMirroredCopy(GetAncestor(h, GA_ROOT), scmhdActiveMap());
+    int command = addonShortcut(msg, wp);
+    if (command >= 0) {
+        if (!(lp & (1L << 30))) runAddonCommand(GetAncestor(h, GA_ROOT), command);
         return 0;
     }
     // keep ScmDraft's brush preview from following the mouse over our controls
@@ -826,7 +828,7 @@ void scmhdForgetBuffer(void *buffer) {
 
 // ---- menu handling ------------------------------------------------------------------------------
 namespace {
-const char *kModeNames[3] = {"HD Graphics: Off", "HD Graphics: Remastered", "HD Graphics: Carbot"};
+const char *kModeNames[3] = {addon_commands::entries[0].label, addon_commands::entries[1].label, addon_commands::entries[2].label};
 HWND g_mainWnd;
 WNDPROC g_origWndProc;
 
@@ -853,9 +855,65 @@ int modeForText(const char *t) {
     return -1;
 }
 
+void runAddonCommand(HWND mainWnd, int index) {
+    if (index >= 0 && index < 3) { setMode(index); return; }
+    if (index == 3) live::setEnabled(!live::enabled(), mainWnd);
+    else if (index == 4) sym::requestMirroredCopy(mainWnd, scmhdActiveMap());
+    else if (index == 5) sym::replaceUnitsBySprites(mainWnd, scmhdActiveMap());
+    else if (index == 6 || index == 7) { hitboxes::toggle(mainWnd, index == 6); redrawLast(); }
+}
+
+HMENU g_newMenu;
+struct PluginItem { HMENU parent = nullptr; UINT id = 0; };
+bool findPluginItem(HMENU menu, const char *label, PluginItem &out) {
+    for (int i = 0; i < GetMenuItemCount(menu); ++i) {
+        HMENU sub = GetSubMenu(menu, i);
+        if (sub && findPluginItem(sub, label, out)) return true;
+        char text[128]{};
+        if (!sub && GetMenuStringA(menu, i, text, sizeof text, MF_BYPOSITION) && !strcmp(text, label)) {
+            out = {menu, GetMenuItemID(menu, i)}; return true;
+        }
+    }
+    return false;
+}
+bool installNewMenu(HWND window) {
+    if (g_newMenu) return true;
+    HMENU bar = GetMenu(window);
+    if (!bar) return false;
+    PluginItem items[8];
+    // InitPlugin returns before ScmDraft inserts our registered commands. Wait until all eight
+    // exist, then move only those commands, preserving their assigned IDs and other plugins.
+    for (int i = 0; i < 8; ++i)
+        if (!findPluginItem(bar, addon_commands::entries[i].label, items[i])) return false;
+    HMENU menu = CreatePopupMenu();
+    if (!menu) return false;
+    for (int i = 0; i < 8; ++i) {
+        if ((i == 3 || i == 6) && !AppendMenuA(menu, MF_SEPARATOR, 0, nullptr)) { DestroyMenu(menu); return false; }
+        if (!AppendMenuA(menu, MF_STRING, items[i].id, addon_commands::entries[i].label)) { DestroyMenu(menu); return false; }
+    }
+    int position = GetMenuItemCount(bar);
+    for (int i = 0; i < position; ++i) {
+        char text[64]{};
+        GetMenuStringA(bar, i, text, sizeof text, MF_BYPOSITION);
+        if (!strcmp(text, "&Help") || !strcmp(text, "Help")) { position = i; break; }
+    }
+    if (!InsertMenuA(bar, position, MF_BYPOSITION | MF_POPUP, reinterpret_cast<UINT_PTR>(menu), "&New")) {
+        DestroyMenu(menu); return false;
+    }
+    for (const auto &item : items) RemoveMenu(item.parent, item.id, MF_BYCOMMAND);
+    g_newMenu = menu;
+    DrawMenuBar(window);
+    logf("Fan Add-on: moved eight commands into New menu");
+    return true;
+}
+
 LRESULT CALLBACK MainWndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     // Join search threads on the UI thread, before DLL teardown takes the loader lock.
-    if (msg == WM_DESTROY && live::enabled()) live::setEnabled(false, h);
+    if (msg == WM_DESTROY) {
+        KillTimer(h, kMenuSetupTimer);
+        if (live::enabled()) live::setEnabled(false, h);
+    }
+    if (msg == WM_INITMENU) installNewMenu(h);
     if (msg == WM_COMMAND && HIWORD(wp) == 0 && !lp) {
         char t[64] = "";
         if (GetMenuStringA(GetMenu(h), LOWORD(wp), t, sizeof t, MF_BYCOMMAND) > 0) {
@@ -867,6 +925,9 @@ LRESULT CALLBACK MainWndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             if (!strcmp(t, kMirrorMenuText)) { sym::requestMirroredCopy(h, scmhdActiveMap()); return 0; }
             if (!strcmp(t, kUnitSpriteMenuText)) { sym::replaceUnitsBySprites(h, scmhdActiveMap()); return 0; }
         }
+    } else if (msg == WM_TIMER && wp == kMenuSetupTimer) {
+        if (installNewMenu(h)) KillTimer(h, kMenuSetupTimer);
+        return 0;
     } else if (msg == WM_TIMER && wp == hitboxes::timerId()) {
         hitboxes::update();
         redrawLast();
@@ -913,6 +974,7 @@ __declspec(dllexport) BOOL __stdcall InitPlugin(HWND mainWnd, HINSTANCE, void *,
     mining::init(g_self, mainWnd);
     hitboxes::init(mainWnd);
     subclassMain(mainWnd);
+    SetTimer(mainWnd, kMenuSetupTimer, 100, nullptr);
     return TRUE;
 }
 

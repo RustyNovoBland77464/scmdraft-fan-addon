@@ -21,7 +21,7 @@ Dependencies are pinned in `release/dependencies.json`. Bootstrap checks out the
 it refuses to replace an existing dependency at another revision. Upstream code is fetched from
 its owners, not bundled into this source ZIP. No game files are required to compile.
 
-Outputs: `scmhd.sdp`, `minesim.exe`, `fan-edit-setup.exe`, and the developer-only `installer-check.exe`.
+Outputs: `scmhd.sdp`, `minesim.exe`, `fan-addon-setup.exe`, and the developer-only `installer-check.exe`.
 Setup embeds the two runtime files and dependency notices as Windows resources. The plugin embeds the live simulator. The separate minesim executable supports offline CLI analysis.
 Its CLI help is printed by running it without arguments; game-data/map inputs are supplied locally.
 

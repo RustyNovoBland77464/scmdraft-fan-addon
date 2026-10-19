@@ -1,4 +1,4 @@
-name: Build Fan Edit
+name: Build Fan Add-on
 on: [push, pull_request, workflow_dispatch]
 permissions:
   contents: read

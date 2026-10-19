@@ -2,7 +2,7 @@
 
 Passed on the development Mac:
 
-- Full standalone 32-bit MinGW build of scmhd.sdp, minesim.exe and fan-edit-setup.exe.
+- Full standalone 32-bit MinGW build of scmhd.sdp, minesim.exe and fan-addon-setup.exe.
 - Clean allowlisted source export, fresh network fetch of all three pinned upstream dependencies,
   and a full build from that exported tree without the development wrapper, local static libraries
   or game files as build inputs.
@@ -21,3 +21,14 @@ Not yet established:
 
 The working editor installation was not updated or terminated by the release build/check scripts.
 The packaged original-editor SHA-256 was obtained from the existing local reference executable.
+
+## 2026-10-20 — New menu and Fan Add-on 0.1.1
+
+- A hidden Win32 host under Wine loaded the actual built plugin and checked delayed command registration,
+  moving all eight commands, preserving the native Triggers command, and creating exactly one New menu.
+- Both hitbox checkmarks started unchecked and changed independently through real WM_COMMAND/menu-update messages.
+- Portable shortcut tests cover exact modifiers, all five chords and preservation of existing native Ctrl+Shift chords.
+- The full cross-build, existing portable regression checks and embedded installer payload verification passed.
+- The running editor was not stopped or updated. The menu harness uses its own hidden window and private plugin copy.
+
+The hidden-host test source and build/run command are in `release/tests/menu_check.cpp`.

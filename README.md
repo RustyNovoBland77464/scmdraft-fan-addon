@@ -1,18 +1,18 @@
-# ScmDraft Fan Edit
+# ScmDraft Fan Add-on
 
 ## Installation
 
-**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-edit/releases/download/v0.1.0-preview.1/scmdraft-fan-edit-0.1.0-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-edit/releases/download/v0.1.0-preview.1/scmdraft-fan-edit-0.1.0-windows-x86.zip)
+**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.1-preview.1/scmdraft-fan-addon-0.1.1-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.1-preview.1/scmdraft-fan-addon-0.1.1-windows-x86.zip)
 
 Sign in to GitHub with an account that has access to this private repository.
 
-1. Install **ScmDraft 2 0.9.10** and confirm it launches. Fan Edit requires a specific build; Setup checks compatibility.
+1. Install **ScmDraft 2 0.9.10** and confirm it launches. Fan Add-on requires a specific build; Setup checks compatibility.
 2. Install **StarCraft: Remastered** locally, including its game data.
-3. Close ScmDraft and run **`scmdraft-fan-edit-0.1.0-setup.exe`**. No ZIP extraction is needed.
+3. Close ScmDraft and run **`scmdraft-fan-addon-0.1.1-setup.exe`**. No ZIP extraction is needed.
 4. Select your existing ScmDraft executable and confirm installation.
 5. Choose the StarCraft game folder containing **`Data`** when prompted.
 6. Launch ScmDraft normally. In its own profile settings, also select the StarCraft game-data folder.
-7. Select **Triggers → HD Graphics → Remastered**. To try mining, select **Triggers → Test Mining**, start a base, enable a boost technique, and press **Search**.
+7. Select **New → HD Graphics → Remastered**. To try mining, select **New → Test Mining**, start a base, enable a boost technique, and press **Search**.
 
 See [INSTALL.md](INSTALL.md) for the supported editor hash, manual installation, macOS/Wine setup, troubleshooting and removal.
 Building from source instead? Follow [BUILDING.md](BUILDING.md).
@@ -20,10 +20,10 @@ Building from source instead? Follow [BUILDING.md](BUILDING.md).
 An unofficial community extension for ScmDraft 2: HD graphics, additional terrain symmetry tools,
 and animated mining analysis with searches for position, Return Cargo and cycle boosts.
 
-**Private preview, version 0.1.0.** Publication and redistribution items are tracked in
+**Private preview, version 0.1.1.** Publication and redistribution items are tracked in
 [RELEASE_READINESS.md](RELEASE_READINESS.md). This draft is not an announcement of author endorsement.
 
-ScmDraft 2 was created by Suicidal Insanity / Stormcoast Fortress. Fan Edit builds on that editor
+ScmDraft 2 was created by Suicidal Insanity / Stormcoast Fortress. Fan Add-on builds on that editor
 through a separate plugin. The original editor remains separately owned and licensed; this source
 release contains our extension, not the original ScmDraft source code.
 
@@ -37,7 +37,7 @@ release contains our extension, not the original ScmDraft source code.
 
   ![Source terrain, a pixel flip, and the terrain-aware Copy Mirrored result](docs/media/terrain-mirroring.png)
 
-- **Hitboxes:** separate overlays for actual building and unit collision boxes.
+- **Hitboxes:** separate overlays for actual building and unit collision boxes, off on launch. Toggle with **Ctrl+Shift+1 / 2**.
 
   ![Building and unit collision boxes overlaid in the editor](docs/media/hitboxes.png)
 

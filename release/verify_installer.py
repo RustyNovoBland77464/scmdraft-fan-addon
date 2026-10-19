@@ -6,7 +6,7 @@ import struct
 import sys
 
 def verify(build):
-    data = (build / "fan-edit-setup.exe").read_bytes()
+    data = (build / "fan-addon-setup.exe").read_bytes()
     pe = struct.unpack_from("<I", data, 0x3c)[0]
     assert data[pe:pe+4] == b"PE\0\0"
     count, optional_size = struct.unpack_from("<H", data, pe+6)[0], struct.unpack_from("<H", data, pe+20)[0]
@@ -29,7 +29,7 @@ def verify(build):
         return next(target for name, target in entries(relative) if name == resource_id)
     rcdata = child(0, 10)
     assert rcdata & 0x80000000
-    for resource_id, name in ((201, "scmhd.sdp"), (202, "minesim.exe"), (203, "ScmDraft-Fan-Edit-NOTICES.txt")):
+    for resource_id, name in ((201, "scmhd.sdp"), (202, "minesim.exe"), (203, "ScmDraft-Fan-Addon-NOTICES.txt")):
         languages = child(rcdata & 0x7fffffff, resource_id)
         assert languages & 0x80000000
         leaf = entries(languages & 0x7fffffff)[0][1]

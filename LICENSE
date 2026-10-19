@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 ScmDraft Fan Edit contributors
+Copyright (c) 2026 ScmDraft Fan Add-on contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Scope: this license covers original ScmDraft Fan Edit contributions only.
+Scope: this license covers original ScmDraft Fan Add-on contributions only.
 It does not relicense the original ScmDraft editor, OpenBW, CascLib, MinHook,
 other third-party software, or Blizzard/Carbot artwork and game data.
 Third-party permissions and notices are described in THIRD_PARTY_NOTICES.md.

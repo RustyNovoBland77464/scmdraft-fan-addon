@@ -1,6 +1,6 @@
 // Live "Test Mining" for ScmDraft 2 (0.9.10), part of scmhd.sdp.
 //
-// Triggers -> Test Mining loads the open map into an embedded OpenBW game (the exact BW 1.16.1
+// New -> Test Mining loads the open map into an embedded OpenBW game (the exact BW 1.16.1
 // engine, data from the SC:R CASC install). Every start location and placed CC / Nexus / Hatchery
 // gets on-map buttons; "Test mining" spawns that base's depot and workers (by default one per nearby
 // mineral field; - / + change it) for its own player, and the engine mines in real time at Fastest
@@ -1438,13 +1438,6 @@ std::unique_ptr<unit_types_t> types;
 
 bool enabled(bool building) { Locked lock; return building ? buildings : units; }
 UINT_PTR timerId() { return kTimer; }
-void load() {
-    Locked lock;
-    DWORD flags = 0, bytes = sizeof flags;
-    RegGetValueA(HKEY_CURRENT_USER, "Software\\ScmDraft HD", "Hitboxes", RRF_RT_REG_DWORD,
-                 nullptr, &flags, &bytes);
-    buildings = (flags & 1) != 0; units = (flags & 2) != 0;
-}
 void update() {  // UI thread, no draw lock across SaveToMemory
     { Locked lock; if (!buildings && !units) return; }
     void *current = scmhdActiveMap();
@@ -1478,16 +1471,16 @@ void toggle(HWND main, bool building) {
         flags = (buildings ? 1 : 0) | (units ? 2 : 0);
         logf("hitboxes: buildings=%d units=%d", buildings, units);
     }
-    HKEY key;
-    if (RegCreateKeyExA(HKEY_CURRENT_USER, "Software\\ScmDraft HD", 0, nullptr, 0, KEY_SET_VALUE,
-                        nullptr, &key, nullptr) == ERROR_SUCCESS) {
-        RegSetValueExA(key, "Hitboxes", 0, REG_DWORD, (const BYTE *)&flags, sizeof flags); RegCloseKey(key);
-    }
     if (flags) { SetTimer(main, kTimer, 250, nullptr); update(); }
     else { KillTimer(main, kTimer); Locked lock; entries.clear(); map = nullptr; }
     RedrawWindow(main, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
 }
-void init(HWND main) { load(); if (buildings || units) SetTimer(main, kTimer, 250, nullptr); }
+void init(HWND main) {
+    KillTimer(main, kTimer);
+    Locked lock;
+    buildings = units = false;
+    entries.clear(); map = nullptr;
+}
 void draw(HDC dc, void *viewMap, int xd, int yd, int wd, int hd, double xs, double ys,
           double ws, double hs, int ox, int oy) {
     if ((!buildings && !units) || !types || ws <= 0 || hs <= 0) return;

@@ -9,6 +9,7 @@
 // hooks see); engine+0xb0 is the CEngineMap, map+0x6fc its StarcraftMap/CHK object, and
 // 0x4b1af0 StarcraftMap::SaveToMemory(format = chk+0x50, &size, &buffer) serializes it like Save.
 #include <windows.h>
+#include "host_image.h"
 #include <cstdint>
 #include <cstdio>
 #include <string>
@@ -20,6 +21,7 @@
 void logf(const char *fmt, ...);
 std::string scmhdStarcraftPath();
 void *scmhdActiveMapChk();
+bool scmhdHooksReady();
 void scmhdLock();
 void scmhdUnlock();
 bool scmhdExportActiveMap(std::vector<uint8_t> &out, std::string &err);
@@ -281,10 +283,14 @@ void init(HMODULE self, HWND mainWnd) { g_self = self; g_main = mainWnd; }
 
 // The open map as CHK bytes, serialized by ScmDraft itself (unsaved edits included).
 bool scmhdExportActiveMap(std::vector<uint8_t> &out, std::string &err) {
+    if (!scmhdHooksReady()) {
+        err = "ScmDraft integration could not start. Check plugins\\scmhd.log for the failed hook or unsupported editor build.";
+        return false;
+    }
     void *chk = scmhdActiveMapChk();
     if (!chk) { err = "No open map found. Open a map and let it draw once, then try again."; return false; }
     int size = 0; void *buf = nullptr;
-    HRESULT hr = reinterpret_cast<mining::SaveToMemoryFn>(mining::kSaveToMemory)(chk, nullptr, mining::at<uint32_t>(chk, 0x50), &size, &buf);
+    HRESULT hr = host_image::pointer<mining::SaveToMemoryFn>(mining::kSaveToMemory)(chk, nullptr, mining::at<uint32_t>(chk, 0x50), &size, &buf);
     if (hr < 0 || !buf || size <= 0) { char m[96]; sprintf(m, "ScmDraft could not serialize the map (hr=0x%08lX).", hr); err = m; return false; }
     out.assign(static_cast<uint8_t *>(buf), static_cast<uint8_t *>(buf) + size);
     // the buffer comes from ScmDraft's CRT (msvcr100 operator new[])

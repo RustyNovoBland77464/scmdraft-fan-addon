@@ -1,5 +1,6 @@
 // HD map units, unit sprites and pure sprites. ScmDraft still owns animation, hit testing and edits.
 #include <windows.h>
+#include "host_image.h"
 #include <algorithm>
 #include <list>
 #include <cstdio>
@@ -357,7 +358,7 @@ void drawLive(void *buffer, uint8_t *bits, int pitch, unsigned image, unsigned f
     paint(liveSurface, bits, pitch, pic, style, bounds, before, left4, top4, flip, nullptr, tintColor(buffer, team[0]));
 }
 bool install() {
-    auto hook = [](uintptr_t address, void *replacement, void **original) { return MH_CreateHook((void *)address, replacement, original) == MH_OK; };
+    auto hook = [](uintptr_t address, void *replacement, void **original) { return host_image::createHook(address, replacement, original, "HD sprites"); };
     return hook(0x4b5730, (void *)&imageHook, (void **)&originalImage) &&
            hook(0x446500, (void *)&normalHook, (void **)&originalNormal) &&
            hook(0x446110, (void *)&flippedHook, (void **)&originalFlipped) &&

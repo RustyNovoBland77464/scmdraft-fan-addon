@@ -2,11 +2,11 @@
 
 ## Installation
 
-**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.2-preview.1/scmdraft-fan-addon-0.1.2-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.2-preview.1/scmdraft-fan-addon-0.1.2-windows-x86.zip)
+**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.3-preview.1/scmdraft-fan-addon-0.1.3-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.3-preview.1/scmdraft-fan-addon-0.1.3-windows-x86.zip)
 
 1. Install **ScmDraft 2 0.9.10** and confirm it launches. Fan Add-on requires a specific build; Setup checks compatibility.
 2. Install **StarCraft: Remastered** locally, including its game data.
-3. Close ScmDraft and run **`scmdraft-fan-addon-0.1.2-setup.exe`**. No ZIP extraction is needed.
+3. Close ScmDraft and run **`scmdraft-fan-addon-0.1.3-setup.exe`**. No ZIP extraction is needed.
 4. Select your existing ScmDraft executable and confirm installation.
 5. Choose the StarCraft game folder containing **`Data`** when prompted.
 6. Launch ScmDraft normally. In its own profile settings, also select the StarCraft game-data folder.
@@ -18,7 +18,7 @@ Building from source instead? Follow [BUILDING.md](BUILDING.md).
 An unofficial community extension for ScmDraft 2: HD graphics, additional terrain symmetry tools,
 and animated mining analysis with searches for position, Return Cargo and cycle boosts.
 
-**Private preview, version 0.1.2.** Publication and redistribution items are tracked in
+**Private preview, version 0.1.3.** Publication and redistribution items are tracked in
 [RELEASE_READINESS.md](RELEASE_READINESS.md). This draft is not an announcement of author endorsement.
 
 ScmDraft 2 was created by Suicidal Insanity / Stormcoast Fortress. Fan Add-on builds on that editor

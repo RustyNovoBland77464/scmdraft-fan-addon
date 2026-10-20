@@ -26,6 +26,7 @@
 //  * 0x501570  SymmetryPanel::Resize(hwnd, expanded, mode) sizes the panel to its last control. We
 //    add our checkboxes and grow the panel to fit them.
 #include <windows.h>
+#include "host_image.h"
 #include <commctrl.h>
 #include <cstdint>
 #include <cstdio>
@@ -155,8 +156,8 @@ using PlaceRectFn = HRESULT(__fastcall *)(void *, void *, int, int, int, int);
 PlaceRectFn g_origPlaceRect;
 SetTileFn g_origSetTile;
 GetTileFn g_origGetTile;
-const SnapFn kSnap = reinterpret_cast<SnapFn>(kSnapIso);
-const RotateFn kRot = reinterpret_cast<RotateFn>(kRotate);
+const SnapFn kSnap = host_image::pointer<SnapFn>(kSnapIso);
+const RotateFn kRot = host_image::pointer<RotateFn>(kRotate);
 
 // ---- walkability (cv5 + vf4) --------------------------------------------------------------------
 const char *kTilesets[8] = {"badlands", "platform", "install", "AshWorld", "Jungle", "Desert", "Ice", "Twilight"};
@@ -1052,7 +1053,7 @@ void requestMirroredCopy(HWND mainWnd, void *map) {
     int r[4];
     if (const char *t = getenv("SCMHD_TESTSELECT"))
         if (map && sscanf(t, "%d,%d,%d,%d", &r[0], &r[1], &r[2], &r[3]) == 4) {
-            reinterpret_cast<HRESULT(__fastcall *)(void *, void *, int, int, int, int, int)>(0x00459500)(
+            host_image::pointer<HRESULT(__fastcall *)(void *, void *, int, int, int, int, int)>(0x00459500)(
                 static_cast<uint8_t *>(map) + MAP_SELECTION, nullptr, r[0], r[1], r[2], r[3], 1);
             at<int16_t>(map, 0x704) = 5;  // the terrain selection tool (map+0x704: 1 paint, 4 paste, 5-7 select)
         }
@@ -1086,11 +1087,11 @@ void replaceUnitsBySprites(HWND mainWnd, void *map) {
     if (!map) return;
     uint8_t *m = static_cast<uint8_t *>(map);
     void *units = m + 0x1dc, *sprites = m + 0x140;
-    if (at<void **>(sprites, 0)[6] != reinterpret_cast<void *>(0x0048e200)) {
+    if (at<void **>(sprites, 0)[6] != host_image::pointer<void *>(0x0048e200)) {
         logf("unitsprite: unexpected sprite editor vtable %p", at<void *>(sprites, 0));
         return;
     }
-    auto exportSel = reinterpret_cast<HRESULT(__fastcall *)(void *, void *, uint32_t *, void *)>(0x00489670);
+    auto exportSel = host_image::pointer<HRESULT(__fastcall *)(void *, void *, uint32_t *, void *)>(0x00489670);
     uint32_t bytes = 0;
     if (exportSel(units, nullptr, &bytes, nullptr) < 0 || !bytes) {
         MessageBoxW(mainWnd, L"Select some units first (Units layer).", L"Replace by Unit Sprite", MB_ICONINFORMATION);
@@ -1119,7 +1120,7 @@ void replaceUnitsBySprites(HWND mainWnd, void *map) {
         MessageBoxW(mainWnd, msg, L"Replace by Unit Sprite", MB_ICONWARNING);
         return;
     }
-    reinterpret_cast<int(__fastcall *)(void *, void *, char)>(0x00436880)(map, nullptr, 1);  // open undo node
+    host_image::pointer<int(__fastcall *)(void *, void *, char)>(0x00436880)(map, nullptr, 1);  // open undo node
     void **uvt = at<void **>(units, 0), **svt = at<void **>(sprites, 0);
     HRESULT hr = reinterpret_cast<HRESULT(__fastcall *)(void *, void *, int, int, int, void *)>(svt[4])(sprites, nullptr, 0, 0, 0, &brush);
     HRESULT hd = hr != 0 ? hr : reinterpret_cast<HRESULT(__fastcall *)(void *, void *)>(uvt[4])(units, nullptr);
@@ -1131,7 +1132,7 @@ void replaceUnitsBySprites(HWND mainWnd, void *map) {
 }
 
 template <class F> bool hook(uintptr_t addr, void *detour, F *orig) {
-    return MH_CreateHook(reinterpret_cast<void *>(addr), detour, reinterpret_cast<void **>(orig)) == MH_OK;
+    return host_image::createHook(addr, detour, reinterpret_cast<void **>(orig), "symmetry");
 }
 
 bool install();

@@ -15,6 +15,7 @@
 //    are needed.
 //  * HD textures come straight from the CASC storage ("TileSet\x.dds.vr4", "HD2\...", Carbot).
 #include <windows.h>
+#include "host_image.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -53,6 +54,15 @@ void logf(const char *fmt, ...) {
     fputc('\n', g_log); fflush(g_log);
 }
 
+bool host_image::createHook(uintptr_t preferredAddress, void *replacement, void **original, const char *name) {
+    void *target = pointer<void *>(preferredAddress);
+    MH_STATUS status = MH_CreateHook(target, replacement, original);
+    if (status != MH_OK)
+        logf("hook %s at %p (preferred %08lx) failed: %s", name, target,
+             static_cast<unsigned long>(preferredAddress), MH_StatusToString(status));
+    return status == MH_OK;
+}
+
 namespace sym { bool install(); void requestMirroredCopy(HWND mainWnd, void *map); void replaceUnitsBySprites(HWND mainWnd, void *map); }
 namespace { bool cascRead(const std::string &name, std::vector<uint8_t> &out); }
 bool scmhdCascRead(const std::string &name, std::vector<uint8_t> &out) { return cascRead(name, out); }
@@ -73,6 +83,8 @@ namespace hitboxes {
 void init(HWND); void toggle(HWND, bool); bool enabled(bool); UINT_PTR timerId(); void update();
 void draw(HDC, void *, int, int, int, int, double, double, double, double, int, int);
 }
+bool g_hooksReady;
+bool scmhdHooksReady() { return g_hooksReady; }
 uint8_t *g_activeBackbuffer;  // backbuffer of the map view drawn last (set by the blit hooks)
 // CEngineMap's CHK object for the map view drawn last: engine = backbuffer - 0x970, map = engine+0xb0,
 // chk = map+0x6fc.
@@ -784,13 +796,25 @@ bool installHooks() {
         logf("unexpected ScmDraft build (timestamp %08lx); HD rendering disabled", nt->FileHeader.TimeDateStamp);
         return false;
     }
-    if (MH_Initialize() != MH_OK) return false;
-    bool ok = MH_CreateHook(reinterpret_cast<void *>(kCopyBlocks), reinterpret_cast<void *>(&CopyHook), reinterpret_cast<void **>(&g_origCopy)) == MH_OK &&
-              sym::install() && hd_sprites::install() &&
-              MH_EnableHook(MH_ALL_HOOKS) == MH_OK;
+    logf("host image base %p, preferred %08lx", dos, static_cast<unsigned long>(host_image::preferredBase));
+    MH_STATUS status = MH_Initialize();
+    if (status != MH_OK) {
+        logf("MinHook initialization failed: %s", MH_StatusToString(status));
+        return false;
+    }
+    bool ok = host_image::createHook(kCopyBlocks, reinterpret_cast<void *>(&CopyHook), reinterpret_cast<void **>(&g_origCopy), "CopyDirtyBlocks") &&
+              sym::install() && hd_sprites::install();
+    if (ok) {
+        status = MH_EnableHook(MH_ALL_HOOKS);
+        if (status != MH_OK) logf("enabling hooks failed: %s", MH_StatusToString(status));
+        ok = status == MH_OK;
+    }
     g_origStretchBlt = reinterpret_cast<StretchBltFn>(patchImport("GDI32.dll", "StretchBlt", reinterpret_cast<void *>(&StretchBltHook)));
     g_origBitBlt = reinterpret_cast<BitBltFn>(patchImport("GDI32.dll", "BitBlt", reinterpret_cast<void *>(&BitBltHook)));
     g_origTranslateAccelerator = reinterpret_cast<TranslateAcceleratorFn>(patchImport("USER32.dll", "TranslateAcceleratorW", reinterpret_cast<void *>(&TranslateAcceleratorHook)));
+    if (!g_origStretchBlt) logf("missing host import GDI32.dll!StretchBlt");
+    if (!g_origBitBlt) logf("missing host import GDI32.dll!BitBlt");
+    if (!g_origTranslateAccelerator) logf("missing host import USER32.dll!TranslateAcceleratorW");
     ok = ok && g_origStretchBlt && g_origBitBlt && g_origTranslateAccelerator;
     logf("hooks %s", ok ? "installed" : "FAILED");
     return ok;
@@ -843,8 +867,8 @@ void setMode(int m) {
     // CRenderEngine::InvalidateTerrain sets +0x12d0. Rebuild static sprite caches too, so
     // switching art styles cannot leave the previous style baked into copied blocks.
     if (engine) {
-        reinterpret_cast<HRESULT(__fastcall *)(void *, void *)>(0x44d870)(engine, nullptr);
-        reinterpret_cast<HRESULT(__fastcall *)(void *, void *, int)>(0x44d930)(engine, nullptr, 1);
+        host_image::pointer<HRESULT(__fastcall *)(void *, void *)>(0x44d870)(engine, nullptr);
+        host_image::pointer<HRESULT(__fastcall *)(void *, void *, int)>(0x44d930)(engine, nullptr, 1);
     }
     logf("mode -> %d", g_mode);
     if (g_mainWnd) RedrawWindow(g_mainWnd, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN);
@@ -1020,7 +1044,7 @@ BOOL WINAPI DllMain(HINSTANCE h, DWORD why, LPVOID) {
         }
         loadMode();
         logf("scmhd loaded, mode %d", g_mode);
-        installHooks();
+        g_hooksReady = installHooks();
     }
     return TRUE;
 }

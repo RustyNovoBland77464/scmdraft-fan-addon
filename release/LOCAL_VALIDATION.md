@@ -42,3 +42,14 @@ The hidden-host test source and build/run command are in `release/tests/menu_che
 - Full 32-bit cross-build, portable/package checks and embedded installer byte verification passed.
 
 Reproduction settings and fixture identifiers are in `release/BOOST_REGRESSIONS.md`.
+
+## 2026-10-20 — Windows image relocation, 0.1.3
+
+- Issue #1 reports `hooks FAILED`, HD graphics unavailable and mining reporting no open map.
+- The supported host has ASLR enabled. Old code used preferred addresses at 0x00400000 even when the host was loaded elsewhere.
+- A synthetic Win32 host loaded at 0x14000000 reproduces the old plugin's `hooks FAILED` log. The corrected plugin installs all 18 real MinHook detours and all three import hooks in the same host. No original executable or game files are needed by this fixture.
+- Hook targets, direct host calls and sprite-editor vtable checks now resolve relative to the loaded executable. Object field offsets remain unchanged.
+- The log now includes the actual host base and MinHook error names/target addresses. Failed integration produces its own mining error instead of claiming no map is open.
+- Portable relocation checks, the full regression suite, 32-bit build and installer payload verification passed.
+
+The integration fixture is `release/tests/host_hooks_check.cpp`; its header contains build and run instructions. The reporter's machine still needs to confirm the updated installer.

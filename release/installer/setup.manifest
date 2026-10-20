@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
-  <assemblyIdentity version="0.1.2.0" processorArchitecture="x86" name="ScmDraftFanAddon.Setup" type="win32"/>
+  <assemblyIdentity version="0.1.3.0" processorArchitecture="x86" name="ScmDraftFanAddon.Setup" type="win32"/>
   <description>ScmDraft Fan Add-on extension setup</description>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security><requestedPrivileges><requestedExecutionLevel level="asInvoker" uiAccess="false"/></requestedPrivileges></security>

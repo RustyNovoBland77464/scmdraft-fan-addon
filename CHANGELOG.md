@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 — private preview
+
+- Fix HD graphics and mining startup when Windows loads ScmDraft at a randomized address.
+- Relocate terrain tools, graphics-mode switching and map export calls with the host executable.
+- Log the exact failed hook and show an integration error instead of “No open map found” when startup fails.
+
 ## 0.1.2 — private preview
 
 - Fix return-cargo and cycle searches rejecting faster mining cycles when the walking distance stays the same or increases slightly.

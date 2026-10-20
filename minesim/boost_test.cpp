@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
     if (baseIndex < 0 || baseIndex >= (int)bases.size()) return 2;
     game_state game; state st; st.global = &gst; st.game = &game;
     game_load_functions f(st);
-    f.load_map_data(chk.data(), chk.size(), [&]() {
+    simulation_map::load(f, chk, [&]() {
         for (int i = 0; i < 8; ++i) st.players[i].controller = player_t::controller_neutral;
         f.setup_info.victory_condition = 2; f.setup_info.starting_units = 1;
     });

@@ -19,7 +19,7 @@ Keep your original download and any editor/runtime installation instructions.
 
 ## Windows installer
 
-[Download the standalone installer](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.3-preview.1/scmdraft-fan-addon-0.1.3-setup.exe). GitHub sign-in and repository access are required.
+[Download the standalone installer](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.1/scmdraft-fan-addon-0.1.4-setup.exe). GitHub sign-in and repository access are required.
 
 1. Run the downloaded `.exe` and select the executable in your existing ScmDraft installation.
 2. Confirm the displayed destination. Use a writable editor folder, outside Program Files if necessary.
@@ -38,7 +38,7 @@ If a copy fails, Setup attempts to restore any files it replaced and reports the
 
 ## Portable ZIP
 
-[Download the portable package](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.3-preview.1/scmdraft-fan-addon-0.1.3-windows-x86.zip) and extract the whole ZIP.
+[Download the portable package](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.1/scmdraft-fan-addon-0.1.4-windows-x86.zip) and extract the whole ZIP.
 Run `fan-addon-setup.exe` from it, or manually copy the three files in `plugins/` into your editor's
 `plugins` folder, backing up older copies first. Keep the package's documentation and license files.
 

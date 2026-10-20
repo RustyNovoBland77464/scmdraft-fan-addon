@@ -1,4 +1,4 @@
-# Release readiness — private preview 0.1.3
+# Release readiness — private preview 0.1.4
 
 A private preview installer is available to repository collaborators. Public distribution is still pending
 the checks below. The maintainer is contacting the original creator separately.

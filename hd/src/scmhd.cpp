@@ -16,6 +16,7 @@
 //  * HD textures come straight from the CASC storage ("TileSet\x.dds.vr4", "HD2\...", Carbot).
 #include <windows.h>
 #include "host_image.h"
+#include "frame_present.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -681,13 +682,24 @@ void afterMapBlit(HDC dst, HWND wnd, int xd, int yd, int wd, int hd, uint8_t *ba
     subclassMapWindow(wnd);
 }
 
+FramePresenter g_presenter;
+bool presentMapBlit(HDC dst, HWND wnd, int xd, int yd, int wd, int hd, uint8_t *back,
+                    double xs, double ys, double ws, double hs) {
+    return g_presenter.present(dst,{xd,yd,xd+wd,yd+hd},[&](HDC frame) {
+        if (!drawMapBlit(frame,xd,yd,wd,hd,back,xs,ys,ws,hs) &&
+            !g_origStretchBlt(frame,xd,yd,wd,hd,at<HDC>(back,B_HDC),int(xs),int(ys),int(ws),int(hs),SRCCOPY)) return false;
+        afterMapBlit(frame,wnd,xd,yd,wd,hd,back,xs,ys,ws,hs);
+        return true;
+    });
+}
+
 void redrawLast() {
     DrawLock lock;
     if (!g_last.wnd || !IsWindow(g_last.wnd) || !g_last.back) return;
     HDC dc = GetDC(g_last.wnd);
     if (!dc) return;
-    if (drawMapBlit(dc, g_last.xd, g_last.yd, g_last.wd, g_last.hd, g_last.back, g_last.xs, g_last.ys, g_last.ws, g_last.hs))
-        afterMapBlit(dc, g_last.wnd, g_last.xd, g_last.yd, g_last.wd, g_last.hd, g_last.back, g_last.xs, g_last.ys, g_last.ws, g_last.hs);
+    presentMapBlit(dc, g_last.wnd, g_last.xd, g_last.yd, g_last.wd, g_last.hd, g_last.back,
+                   g_last.xs, g_last.ys, g_last.ws, g_last.hs);
     ReleaseDC(g_last.wnd, dc);
 }
 
@@ -696,9 +708,9 @@ BOOL WINAPI StretchBltHook(HDC hdcDst, int xd, int yd, int wd, int hd, HDC hdcSr
     uint8_t *back = nullptr;
     HWND wnd = WindowFromDC(hdcDst);
     if (isMapWindow(wnd) && rop == SRCCOPY) { auto it = g_bufferForDC.find(hdcSrc); if (it != g_bufferForDC.end()) back = g_activeBackbuffer = it->second; }
-    BOOL r = (back && drawMapBlit(hdcDst, xd, yd, wd, hd, back, xs, ys, ws, hs)) ? TRUE
-             : g_origStretchBlt(hdcDst, xd, yd, wd, hd, hdcSrc, xs, ys, ws, hs, rop);
-    if (back) afterMapBlit(hdcDst, wnd, xd, yd, wd, hd, back, xs, ys, ws, hs);
+    if (back && presentMapBlit(hdcDst,wnd,xd,yd,wd,hd,back,xs,ys,ws,hs)) return TRUE;
+    BOOL r=g_origStretchBlt(hdcDst,xd,yd,wd,hd,hdcSrc,xs,ys,ws,hs,rop);
+    if (back) afterMapBlit(hdcDst,wnd,xd,yd,wd,hd,back,xs,ys,ws,hs);
     return r;
 }
 
@@ -715,9 +727,9 @@ BOOL WINAPI BitBltHook(HDC hdcDst, int xd, int yd, int w, int h, HDC hdcSrc, int
     if (!back) return g_origBitBlt(hdcDst, xd, yd, w, h, hdcSrc, xs, ys, rop);
     // the 50% view blits from a half-size copy; work in full-resolution backbuffer coordinates
     double k = half ? 2.0 : 1.0;
-    BOOL r = drawMapBlit(hdcDst, xd, yd, w, h, back, xs * k, ys * k, w * k, h * k) ? TRUE
-             : g_origBitBlt(hdcDst, xd, yd, w, h, hdcSrc, xs, ys, rop);
-    afterMapBlit(hdcDst, wnd, xd, yd, w, h, back, xs * k, ys * k, w * k, h * k);
+    if (presentMapBlit(hdcDst,wnd,xd,yd,w,h,back,xs*k,ys*k,w*k,h*k)) return TRUE;
+    BOOL r=g_origBitBlt(hdcDst,xd,yd,w,h,hdcSrc,xs,ys,rop);
+    afterMapBlit(hdcDst,wnd,xd,yd,w,h,back,xs*k,ys*k,w*k,h*k);
     return r;
 }
 

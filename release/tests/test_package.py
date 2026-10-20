@@ -23,7 +23,7 @@ class PackageChecks(unittest.TestCase):
             self.assertFalse((source / "third_party/openbw").exists())
             archive = Path(str(source) + ".zip")
             self.assertTrue(archive.exists())
-            self.assertEqual(archive.name, "scmdraft-fan-addon-0.1.3-preview.1-source.zip")
+            self.assertEqual(archive.name, "scmdraft-fan-addon-0.1.4-preview.1-source.zip")
             before = hashlib.sha256(archive.read_bytes()).hexdigest()
             with self.assertRaises(ValueError):
                 prepare.prepare(Path(tmp))

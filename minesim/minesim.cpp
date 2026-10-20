@@ -16,6 +16,7 @@
 //   --workers counts mineral workers; --gas adds a completed refinery on the closest geyser with 3 more.
 // Output: JSON on stdout.
 #include "bwgame.h"
+#include "../hd/src/simulation_map.h"
 #include "CascLib.h"
 
 #include <algorithm>
@@ -139,7 +140,7 @@ struct simulator {
         game_state game; state st; st.global = &gst; st.game = &game;
         game_load_functions load(st);
         std::vector<uint8_t> data = chk;
-        load.load_map_data(data.data(), data.size(), [&]() {
+        simulation_map::load(load, data, [&]() {
             for (size_t i = 0; i < 8; i++) st.players[i].controller = player_t::controller_closed;
             load.setup_info.victory_condition = 2; load.setup_info.starting_units = 1;
         });
@@ -157,7 +158,7 @@ struct simulator {
         game_load_functions load(st);
         std::vector<uint8_t> data = chk;
         const int owner = 0;
-        load.load_map_data(data.data(), data.size(), [&]() {
+        simulation_map::load(load, data, [&]() {
             for (size_t i = 0; i < 12; i++)
                 if (i < 8) st.players[i].controller = player_t::controller_closed;
             // neutral during load so no melee start is created at its start location; we place the base

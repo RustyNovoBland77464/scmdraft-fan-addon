@@ -10,6 +10,7 @@
 // HD terrain. Each field shows its live minerals per minute, each base its income. "Stop" removes the
 // base's units again; turning Test Mining off removes everything.
 #include "bwgame.h"
+#include "simulation_map.h"
 #include "ui/ui.h"
 #include "mining_boost.h"
 #include "return_boost.h"
@@ -220,7 +221,7 @@ bool loadGame(Game &G) {
     st.global = g_gst.get(); st.game = G.game.get();
     Funcs load(st);
     std::vector<uint8_t> data = G.chk;
-    load.load_map_data(data.data(), data.size(), [&]() {
+    simulation_map::load(load, data, [&]() {
         // every player slot neutral during load: no melee starts; bases are spawned on demand
         for (size_t i = 0; i < 8; i++) st.players[i].controller = player_t::controller_neutral;
         load.setup_info.victory_condition = 2;

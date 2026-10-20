@@ -2,7 +2,7 @@
 
 ## Installation
 
-**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.1/scmdraft-fan-addon-0.1.4-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.1/scmdraft-fan-addon-0.1.4-windows-x86.zip)
+**[Download the Windows installer (.exe)](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.2/scmdraft-fan-addon-0.1.4-setup.exe)** · [Portable ZIP](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.2/scmdraft-fan-addon-0.1.4-windows-x86.zip)
 
 1. Install **ScmDraft 2 0.9.10** and confirm it launches. Fan Add-on requires a specific build; Setup checks compatibility.
 2. Install **StarCraft: Remastered** locally, including its game data.

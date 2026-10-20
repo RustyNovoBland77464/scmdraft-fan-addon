@@ -3,7 +3,7 @@
 ## 0.1.4 — preview
 
 - Load maps containing disabled unit sprites in Test Mining, preserving their disabled state and collision footprint in the simulation.
-- Compose the map, mining stats and controls offscreen and present them together to prevent panel flickering between drawing steps.
+- Compose the map, mining stats and controls offscreen and present them together to prevent panel flickering between drawing steps. Flush Windows GDI batches before either drawing thread reuses the frame.
 
 ## 0.1.3 — private preview
 

@@ -58,7 +58,7 @@ The integration fixture is `release/tests/host_hooks_check.cpp`; its header cont
 
 - A local engine fixture adds a disabled neutral unit sprite and an enabled neighbor to a supplied map. The original parser reproduces `disable thingy unit`. The shared live/headless loader passes, retains the disabled unit with collision and the enabled neighbor, and advances 600 frames without changing the source bytes.
 - Asset-free preprocessing checks cover mixed pure/unit sprites, unchanged source data and truncated chunk bounds. OpenBW remains pinned and unmodified; only the simulation copy's unsupported flag is deferred until the units have loaded, before initial processing.
-- A real GDI harness under Wine checks that map-only intermediate frames never reach the target, partial repaint coordinates and clipping are preserved, and a failed composition leaves the displayed frame intact.
+- A real GDI harness under Wine checks that map-only intermediate frames never reach the target, partial repaint coordinates and clipping are preserved, and a failed composition leaves the displayed frame intact. Complete frames flush their thread-local GDI batch before the shared surface can be reused by the other drawing thread.
 - The complete 32-bit build, portable/package checks and embedded installer payload checks passed.
 
 Fixtures: `release/tests/map_load_check.cpp` and `release/tests/frame_present_check.cpp`. The reported first-map name was not supplied, so the loading test reproduces the exact error with synthetic sprite records. Visual confirmation on the user's Windows PC remains pending.

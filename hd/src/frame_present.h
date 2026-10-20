@@ -45,6 +45,10 @@ public:
         IntersectClipRect(dc_,visible.left,visible.top,visible.right,visible.bottom);
         bool ok=draw(dc_);
         RestoreDC(dc_,saved);
-        return ok && BitBlt(target,visible.left,visible.top,w,h,dc_,0,0,SRCCOPY);
+        bool copied=ok && BitBlt(target,visible.left,visible.top,w,h,dc_,0,0,SRCCOPY);
+        // Windows batches GDI per thread. Finish before the draw lock is released:
+        // another thread may immediately reuse this bitmap for the next frame.
+        bool flushed=GdiFlush()!=FALSE;
+        return copied && flushed;
     }
 };

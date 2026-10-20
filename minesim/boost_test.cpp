@@ -307,6 +307,30 @@ int main(int argc, char **argv) {
                 baseIndex,top,f.get_unit(fields[top])->position.x,f.get_unit(fields[top])->position.y,
                 plan.chosen[top].cargoDelay,plan.selected[top].mean(),m.mean(),m.commandedTrips,m.trips);
         }
+        if (getenv("BOOST_REQUIRE_FIELD_FRAMES")) {
+            size_t field = size_t(boost_study::setting("BOOST_REGRESSION_FIELD", 0));
+            assert(field < a.size());
+            double ceiling = atof(getenv("BOOST_REQUIRE_FIELD_FRAMES"));
+            assert(plan.selected[field].mean() > 0 && plan.selected[field].mean() <= ceiling);
+            if (plan.baseline[field].mean() > ceiling) assert(plan.chosen[field].enabled);
+            if (plan.chosen[field].enabled) assert(plan.improves(plan.selected[field], plan.baseline[field], true));
+            return_boost::Trial holdout(st, a, plan.chosen, cargoRules, 32768, false, cycleMode, 8192);
+            while (!holdout.done()) holdout.advance(4096);
+            const auto &m = holdout.metrics[field];
+            assert(!m.switched && m.cycles.stable && m.mean() > 0 && m.mean() <= ceiling);
+            if (plan.chosen[field].enabled) {
+                assert(m.commandedTrips == m.trips);
+                for (const auto &block : m.blocks)
+                    assert(block.stable && block.trips >= 8 && block.commandedTrips == block.trips && block.mean() <= ceiling);
+            }
+            auto *patch = f.get_unit(fields[field]);
+            printf("field regression: base %d field %zu at %d,%d offset=%d,%d normal=%.6f validated=%.6f holdout=%.6f path=%.6f/%.6f commands=%d/%d\n",
+                baseIndex, field, patch->position.x, patch->position.y,
+                patch->position.x-depot->position.x, patch->position.y-depot->position.y,
+                plan.baseline[field].mean(), plan.selected[field].mean(), m.mean(),
+                plan.baseline[field].path(), plan.selected[field].path(), m.commandedTrips, m.trips);
+            fflush(stdout);
+        }
         cargoRules.insert(cargoRules.end(), plan.chosen.begin(), plan.chosen.end());
         for (const auto &r : plan.chosen) if (r.enabled && r.cycle)
             printf("cycle worker %zu via %zu delay %d detour %d\n", r.worker, r.neighbor, r.delay, r.detour);

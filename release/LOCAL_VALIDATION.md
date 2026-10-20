@@ -32,3 +32,13 @@ The packaged original-editor SHA-256 was obtained from the existing local refere
 - The running editor was not stopped or updated. The menu harness uses its own hidden window and private plugin copy.
 
 The hidden-host test source and build/run command are in `release/tests/menu_check.cpp`.
+
+## 2026-10-20 — Sustained-speed boost acceptance, 0.1.2
+
+- Production cargo searches on Attitude and Octagon, both left spawns, accepted the end-patch boost. Each held 150 frames over an independent 32,768-frame replay (8,192-frame warmup), with Return Cargo delivered on all 163 measured trips.
+- Position → cargo → cycle combinations passed the same holdout on all four spawns after 2,400 settling frames, with nine mineral workers and three gas workers.
+- Attitude Zerg, both right spawns, retained the earlier top-patch regression: 150-frame validated and holdout cycles, with all 108 commands delivered.
+- Portable tests exercise the actual acceptance function: faster equal/longer routes pass; shorter routes without a speed gain, unstable routes, missing commands and a non-improving late block fail.
+- Full 32-bit cross-build, portable/package checks and embedded installer byte verification passed.
+
+Reproduction settings and fixture identifiers are in `release/BOOST_REGRESSIONS.md`.

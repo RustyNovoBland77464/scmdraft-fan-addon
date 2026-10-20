@@ -204,7 +204,8 @@ struct Trial {
 
 // Cargo timing comes from observed return positions; cycle timing tests neighboring patches
 // and two delays after delivery. Both replay commands on every trip from identical engine states.
-// Keep only a shorter affected leg AND a faster complete cycle; no command is a valid result.
+// Score complete-cycle throughput. A command can reduce braking/order waits without shortening
+// the pixel route; distance is a diagnostic, not an eligibility requirement.
 struct SearchConfig {
     int cargoStride = 4;
     bool adaptive = true, earlyReject = true, pickupTiming = true;
@@ -326,14 +327,14 @@ struct Plan {
         longCache=out->longCache; return out;
     }
     bool done() const { return phase == 4; }
-    bool improves(const Metric &m, const Metric &control, bool final=false) const {
+    static bool improves(const Metric &m, const Metric &control, bool final=false) {
         if (final) for (size_t i=0; i<m.blocks.size(); ++i) {
             const auto &b=m.blocks[i], &c=control.blocks[i];
             if (!b.stable || b.trips<8 || b.commandedTrips!=b.trips || !c.mean() ||
-                b.mean()>=c.mean()-0.1 || b.path()>=c.path()-0.05) return false;
+                b.mean()>=c.mean()-0.1) return false;
         }
         return !m.switched && m.trips >= 8 && m.commandedTrips == m.trips && m.cycles.stable &&
-               control.mean() > 0 && m.mean() < control.mean() - 0.5 && m.path() < control.path() - 0.25;
+               control.mean() > 0 && m.mean() < control.mean() - 0.5;
     }
     static bool same(const Rule &a, const Rule &b) {
         return a.spot==b.spot && a.cycle==b.cycle && a.neighbor==b.neighbor && a.delay==b.delay && a.detour==b.detour && a.cargoDelay==b.cargoDelay;
@@ -554,8 +555,7 @@ struct Plan {
                 if (trial->metrics[i].switched || trial->metrics[i].commandedTrips!=trial->metrics[i].trips) viable=false;
             // A truncated invalid group cannot seed refinement from partial timing samples.
             if (!polishing && viable && !m.switched && m.trips>=8 && m.commandedTrips==m.trips && m.cycles.stable &&
-                m.mean()<baseline[worker].mean()+(cycleSearch ? 0.5 : 1.0) &&
-                m.path()<baseline[worker].path()+(cycleSearch ? -0.1 : 1.0)) {
+                m.mean()<baseline[worker].mean()+(cycleSearch ? 0.5 : 1.0)) {
                 auto &v=promising[worker]; v.push_back({trial->rate(),candidates[worker][candidate]});
                 std::stable_sort(v.begin(),v.end(),[](const auto &a,const auto &b){return a.first>b.first;});
                 if (v.size()>2) v.resize(2);

@@ -89,9 +89,9 @@ def prepare(out, build=None):
     # Never erase an existing export or write into the source checkout.
     out = out.resolve()
     out.mkdir(parents=True, exist_ok=True)
-    trees = [out / "scmdraft-fan-addon-0.1.1-preview.1-source"]
+    trees = [out / "scmdraft-fan-addon-0.1.2-preview.1-source"]
     if build:
-        trees.append(out / "scmdraft-fan-addon-0.1.1-preview.1-windows-x86")
+        trees.append(out / "scmdraft-fan-addon-0.1.2-preview.1-windows-x86")
     if any(t.exists() or Path(str(t) + ".zip").exists() for t in trees):
         raise ValueError("Output already exists. Choose a fresh --out folder; existing packages are preserved.")
     source = trees[0]
@@ -106,7 +106,7 @@ def prepare(out, build=None):
     (source / ".gitignore").write_text("/build/\n/dist/\n/third_party/CascLib/\n/third_party/minhook/\n/third_party/openbw/\n__pycache__/\n*.log\n.DS_Store\n")
     copy(ROOT / "release/ci.yml", source / ".github/workflows/build.yml")
     revision = subprocess.check_output(["git", "-C", str(ROOT), "rev-parse", "HEAD"], text=True).strip() if (ROOT / ".git").exists() else "exported-source"
-    (source / "SOURCE_MANIFEST.json").write_text(json.dumps({"version": "0.1.1-preview.1", "base_revision": revision,
+    (source / "SOURCE_MANIFEST.json").write_text(json.dumps({"version": "0.1.2-preview.1", "base_revision": revision,
         "includes_working_tree": True, "status": "LOCAL DRAFT — publication items in RELEASE_READINESS.md",
         "files": hashes(source)}, indent=2) + "\n")
     audit_source(source)

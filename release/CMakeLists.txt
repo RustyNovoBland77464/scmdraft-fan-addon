@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(ScmDraftFanAddon VERSION 0.1.1 LANGUAGES C CXX)
+project(ScmDraftFanAddon VERSION 0.1.2 LANGUAGES C CXX)
 enable_language(RC)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

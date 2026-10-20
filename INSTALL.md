@@ -19,7 +19,7 @@ Keep your original download and any editor/runtime installation instructions.
 
 ## Windows installer
 
-[Download the standalone installer](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.2/scmdraft-fan-addon-0.1.4-setup.exe). GitHub sign-in and repository access are required.
+[Download the standalone installer](https://github.com/RustyNovoBland77464/scmdraft-fan-addon/releases/download/v0.1.4-preview.2/scmdraft-fan-addon-0.1.4-setup.exe). 
 
 1. Run the downloaded `.exe` and select the executable in your existing ScmDraft installation.
 2. Confirm the displayed destination. Use a writable editor folder, outside Program Files if necessary.

@@ -54,8 +54,6 @@ No game-data archives or original ScmDraft executable are included. Documentatio
 
 The Windows build targets Windows 10/11 (32-bit plugin, also usable on 64-bit Windows).
 Only one exact **32-bit ScmDraft 0.9.10** executable is supported; see [INSTALL.md](INSTALL.md).
-The Windows plugin is currently exercised under Wine on macOS. Native Windows compatibility
-still needs a clean-machine check. A redistributable macOS application wrapper is not included yet.
 
 - Users: extract the entire Windows package and follow [INSTALL.md](INSTALL.md).
 - Developers: see [BUILDING.md](BUILDING.md) and [CONTRIBUTING.md](CONTRIBUTING.md).
